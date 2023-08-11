@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: Intel Corporation
-//
-// SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
@@ -41,13 +38,13 @@ public:
     Iter data = data_ + row_index * ld_;
     __ranges::subrange row_values(data, data + shape()[1]);
 
-    auto row_indices = __ranges::views::iota(size_type(0), size_type(shape()[1]));
+    auto column_indices = __ranges::views::iota(size_type(0), size_type(shape()[1]));
 
-    return __ranges::views::zip(row_indices, row_values);
+    return __ranges::views::zip(column_indices, row_values);
   }
 
   auto column(size_type column_index) const {
-    auto column_indices =
+    auto row_indices =
         __ranges::views::iota(size_type(0), size_type(shape()[0]));
 
     Iter data = data_ + column_index;
@@ -55,7 +52,7 @@ public:
     size_type ld = ld_;
     auto column_values = __ranges::views::stride(data_view, ld);
 
-    return __ranges::views::zip(column_indices, column_values);
+    return __ranges::views::zip(row_indices, column_values);
   }
 
   Iter data() const { return data_; }

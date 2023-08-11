@@ -7,23 +7,23 @@
 #include <fmt/ranges.h>
 
 template <std::ranges::forward_range R>
-void range(R&&) {
-  fmt::print("forward_range\n");
+auto range(R&&) {
+  return std::string("forward_range");
 }
 
 template <std::ranges::bidirectional_range R>
-void range(R&&) {
-  fmt::print("bidirectional_range\n");
+auto range(R&&) {
+  return std::string("bidirectional_range");
 }
 
 template <std::ranges::random_access_range R>
-void range(R&&) {
-  fmt::print("random_access_range\n");
+auto range(R&&) {
+  return std::string("random_access_range");
 }
 
 template <std::ranges::contiguous_range R>
-void range(R&&) {
-  fmt::print("contiguous_range\n");
+auto range(R&&) {
+  return std::string("contiguous_range");
 }
 
 int main(int argc, char** argv) {
