@@ -6,30 +6,12 @@
 #include <fmt/core.h>
 #include <fmt/ranges.h>
 
-template <std::ranges::forward_range R>
-auto range(R&&) {
-  return std::string("forward_range");
-}
-
-template <std::ranges::bidirectional_range R>
-auto range(R&&) {
-  return std::string("bidirectional_range");
-}
-
-template <std::ranges::random_access_range R>
-auto range(R&&) {
-  return std::string("random_access_range");
-}
-
-template <std::ranges::contiguous_range R>
-auto range(R&&) {
-  return std::string("contiguous_range");
-}
-
 int main(int argc, char** argv) {
+  using T = int;
+
   std::size_t m = 10;
   std::size_t n = 10;
-  std::vector<int> v(m*n);
+  std::vector<T> v(m*n);
 
   std::iota(v.begin(), v.end(), 0);
 

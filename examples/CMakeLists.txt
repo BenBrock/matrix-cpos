@@ -3,4 +3,4 @@ function(add_example example_name)
 	target_link_libraries(${example_name} mc)
 endfunction()
 
-add_example(test)
+add_example(dense_matrix_example)
