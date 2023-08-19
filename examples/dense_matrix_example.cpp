@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
     fmt::print("\n");
   }
 
+  fmt::print("Rows:\n");
   for (std::size_t i = 0; i < view.shape()[0]; i++) {
     auto row = view.row(i);
     fmt::print("{}\n", row);
@@ -36,11 +37,20 @@ int main(int argc, char** argv) {
     fmt::print("{}\n", row_values);
   }
 
+  fmt::print("Columns:\n");
   for (std::size_t j = 0; j < view.shape()[1]; j++) {
     auto col = view.column(j);
     fmt::print("{}\n", col);
     auto col_values = std::ranges::views::values(col);
     fmt::print("{}\n", col_values);
+  }
+
+  fmt::print("Diagonals:\n");
+  for (std::size_t d = 0; d < view.num_diagonals(); d++) {
+    auto diagonal = view.diagonal(d);
+    fmt::print("{}\n", diagonal);
+    auto diagonal_values = std::ranges::views::values(diagonal);
+    fmt::print("{}\n", diagonal_values);
   }
 
   return 0;

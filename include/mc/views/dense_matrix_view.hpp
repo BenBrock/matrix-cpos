@@ -30,6 +30,10 @@ public:
 
   size_type size() const noexcept { return shape()[0] * shape()[1]; }
 
+  size_type num_diagonals() const noexcept {
+    return shape()[0] + shape()[1] - 1;
+  }
+
   scalar_reference operator[](key_type idx) const {
     return data_[idx[0] * ld_ + idx[1]];
   }
@@ -48,11 +52,76 @@ public:
         __ranges::views::iota(size_type(0), size_type(shape()[0]));
 
     Iter data = data_ + column_index;
-    __ranges::subrange data_view(data, data_ + shape()[0]*ld_);
-    size_type ld = ld_;
-    auto column_values = __ranges::views::stride(data_view, ld);
+    __ranges::subrange data_view(data, data_ + shape()[0]*ld());
+    auto column_values = __ranges::views::stride(data_view, ld());
 
     return __ranges::views::zip(row_indices, column_values);
+  }
+
+  // NOTE: the diagonal() method allows both negative and positive
+  //       diagonal indices. For example, in the matrix:
+  //
+  //       0 1 2
+  //       4 5 6
+  //       7 8 9
+  // 
+  // We have the following diagonals
+  // - diagonal(0) returns [0, 5, 9]
+  // - diagonal(1) returns [1, 6]
+  // - diagonal(2) OR diagonal(-2) returns [7]
+  // - diagonal(3) OR diagonal(-1) returns [4, 8]
+  // 
+  // This negative indexing is commonly used in many scientific codes.
+  // However, we also support positive indexing to support easily
+  // iterating through all diagonals.  The negative indexing works
+  // similarly to negative array indexing in Python.
+  // (x[-1] returns the last element in positive indexing, x[-2] the
+  //  next to last element, and so forth.)
+  //
+  // The two styles can easily be converted back and forth:
+  // (Modulos not necessary if we have a range precondition.)
+  // negative to positive array index:
+  // (d + n) % n
+  // Positive to negative array index:
+  // (IF greater than highest desired positive index)
+  // (d - n) % n
+
+  // Precondition: diagonal_index is in the range [0, num_diagonals())
+  auto diagonal(difference_type diagonal_index) const {
+    if (diagonal_index < 0) {
+      // If given negative diagonal index, convert to positive index.
+      // d = (d + n) % n
+      // Elide mod because of range precondition.
+      diagonal_index = num_diagonals() + diagonal_index;
+    }
+
+    if (diagonal_index < shape()[1]) {
+      auto diagonal_indices = __ranges::views::iota(size_type(0), std::min(shape()[0], shape()[1] - size_type(diagonal_index)));
+
+      size_type column_index = diagonal_index;
+      Iter data = data_ + diagonal_index;
+      __ranges::subrange data_view(data, data_ + shape()[0]*ld());
+
+      auto diagonal_values = __ranges::views::stride(data_view, ld()+1);
+
+      return __ranges::views::zip(diagonal_indices, diagonal_values);
+    } else {
+      // Convert positive to negative diagonal index.
+      // d = (d - n) % n
+      // Elide mod because of range precondition.
+      difference_type negative_d = diagonal_index - num_diagonals();
+
+      auto diagonal_indices = __ranges::views::iota(size_type(0), std::min(shape()[1], shape()[0] + negative_d));
+
+      size_type row_index = -negative_d;
+      Iter data = data_ + row_index*ld_;
+
+      __ranges::subrange data_view(data, data_ + shape()[0]*ld());
+
+      auto diagonal_values = __ranges::views::stride(data_view, ld()+1);
+
+      return __ranges::views::zip(diagonal_indices, diagonal_values);
+    }
   }
 
   Iter data() const { return data_; }

@@ -4,3 +4,4 @@ function(add_example example_name)
 endfunction()
 
 add_example(dense_matrix_example)
+add_example(csr_matrix_example)
