@@ -5,7 +5,7 @@
 
 namespace mc {
 
-template <typename T, typename I, typename TIter = T *, typename IIter = I *>
+template <typename T, typename I, std::forward_iterator TIter = T *, std::forward_iterator IIter = I *>
 class csr_matrix_view
     : public __ranges::view_interface<csr_matrix_view<T, I, TIter, IIter>> {
 public:
@@ -33,8 +33,10 @@ public:
     I first = rowptr_[row_index];
     I last = rowptr_[row_index + 1];
 
-    __ranges::subrange row_values(values_data() + first, values_data() + last);
-    __ranges::subrange column_indices(colind_data() + first, colind_data() + last);
+    __ranges::subrange row_values(__ranges::next(values_data(), first),
+                                  __ranges::next(values_data(), last));
+    __ranges::subrange column_indices(__ranges::next(colind_data(), first),
+                                      __ranges::next(colind_data(), last));
 
     return __ranges::views::zip(column_indices, row_values);
   }

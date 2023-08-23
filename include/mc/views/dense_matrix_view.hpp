@@ -8,7 +8,7 @@
 
 namespace mc {
 
-template <typename T, typename Iter = T *>
+template <typename T, std::forward_iterator Iter = T *>
 class dense_matrix_view
     : public __ranges::view_interface<dense_matrix_view<T, Iter>> {
 public:
@@ -34,13 +34,15 @@ public:
     return shape()[0] + shape()[1] - 1;
   }
 
-  scalar_reference operator[](key_type idx) const {
+  scalar_reference operator[](key_type idx) const
+  requires(std::random_access_iterator<Iter>)
+  {
     return data_[idx[0] * ld_ + idx[1]];
   }
 
   auto row(size_type row_index) const {
-    Iter data = data_ + row_index * ld_;
-    __ranges::subrange row_values(data, data + shape()[1]);
+    Iter data = __ranges::next(data_, row_index * ld_);
+    __ranges::subrange row_values(data, __ranges::next(data, shape()[1]));
 
     auto column_indices = __ranges::views::iota(size_type(0), size_type(shape()[1]));
 
@@ -51,8 +53,8 @@ public:
     auto row_indices =
         __ranges::views::iota(size_type(0), size_type(shape()[0]));
 
-    Iter data = data_ + column_index;
-    __ranges::subrange data_view(data, data_ + shape()[0]*ld());
+    Iter data = __ranges::next(data_, column_index);
+    __ranges::subrange data_view(data, __ranges::next(data_, shape()[0]*ld()));
     auto column_values = __ranges::views::stride(data_view, ld());
 
     return __ranges::views::zip(row_indices, column_values);
@@ -99,8 +101,8 @@ public:
       auto diagonal_indices = __ranges::views::iota(size_type(0), std::min(shape()[0], shape()[1] - size_type(diagonal_index)));
 
       size_type column_index = diagonal_index;
-      Iter data = data_ + diagonal_index;
-      __ranges::subrange data_view(data, data_ + shape()[0]*ld());
+      Iter data = __ranges::next(data_, diagonal_index);
+      __ranges::subrange data_view(data, __ranges::next(data_, shape()[0]*ld()));
 
       auto diagonal_values = __ranges::views::stride(data_view, ld()+1);
 
@@ -114,9 +116,9 @@ public:
       auto diagonal_indices = __ranges::views::iota(size_type(0), std::min(shape()[1], shape()[0] + negative_d));
 
       size_type row_index = -negative_d;
-      Iter data = data_ + row_index*ld_;
+      Iter data = __ranges::next(data_, row_index*ld_);
 
-      __ranges::subrange data_view(data, data_ + shape()[0]*ld());
+      __ranges::subrange data_view(data, __ranges::next(data_, shape()[0]*ld()));
 
       auto diagonal_values = __ranges::views::stride(data_view, ld()+1);
 
