@@ -1,7 +1,7 @@
 #include <mc/mc.hpp>
 
-#include <vector>
 #include <numeric>
+#include <vector>
 
 #include <fmt/core.h>
 #include <fmt/ranges.h>
@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
 
   std::size_t m = 10;
   std::size_t n = 10;
-  std::vector<T> v(m*n);
+  std::vector<T> v(m * n);
 
   std::iota(v.begin(), v.end(), 0);
 
@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
   for (std::size_t i = 0; i < view.shape()[0]; i++) {
     for (std::size_t j = 0; j < view.shape()[1]; j++) {
       fmt::print("{:2d}", view[{i, j}]);
-      if (j != view.shape()[1]-1) {
+      if (j != view.shape()[1] - 1) {
         fmt::print(", ");
       }
     }

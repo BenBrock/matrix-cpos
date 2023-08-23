@@ -1,11 +1,12 @@
 #pragma once
 
-#include <mc/index.hpp>
 #include <iterator>
+#include <mc/index.hpp>
 
 namespace mc {
 
-template <typename T, typename I, std::forward_iterator TIter = T *, std::forward_iterator IIter = I *>
+template <typename T, typename I, std::forward_iterator TIter = T*,
+          std::forward_iterator IIter = I*>
 class csr_matrix_view
     : public __ranges::view_interface<csr_matrix_view<T, I, TIter, IIter>> {
 public:
@@ -57,8 +58,8 @@ private:
 };
 
 template <typename TIter, typename IIter, typename... Args>
-csr_matrix_view(TIter, IIter, IIter, Args &&...)
+csr_matrix_view(TIter, IIter, IIter, Args&&...)
     -> csr_matrix_view<std::iter_value_t<TIter>, std::iter_value_t<IIter>,
                        TIter, IIter>;
 
-} // end mc
+} // namespace mc

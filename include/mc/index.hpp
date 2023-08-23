@@ -2,9 +2,9 @@
 #pragma once
 
 #include <any>
+#include <cassert>
 #include <concepts>
 #include <limits>
-#include <cassert>
 #include <tuple>
 
 namespace mc {
@@ -69,7 +69,7 @@ public:
     second = *(tuple.begin() + 1);
   }
 
-  constexpr bool operator==(const index &) const noexcept = default;
+  constexpr bool operator==(const index&) const noexcept = default;
 
   template <std::size_t Index>
   constexpr T get() const noexcept
@@ -85,10 +85,10 @@ public:
 
   index() = default;
   ~index() = default;
-  index(const index &) = default;
-  index &operator=(const index &) = default;
-  index(index &&) = default;
-  index &operator=(index &&) = default;
+  index(const index&) = default;
+  index& operator=(const index&) = default;
+  index(index&&) = default;
+  index& operator=(index&&) = default;
 
   index_type first;
   index_type second;
@@ -117,4 +117,4 @@ inline constexpr I get(mc::index<I> index)
   }
 }
 
-} // end std
+} // namespace std

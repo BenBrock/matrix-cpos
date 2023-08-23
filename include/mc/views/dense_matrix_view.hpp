@@ -3,12 +3,12 @@
 
 #include <iterator>
 
-#include <mc/ranges.hpp>
 #include <mc/index.hpp>
+#include <mc/ranges.hpp>
 
 namespace mc {
 
-template <typename T, std::forward_iterator Iter = T *>
+template <typename T, std::forward_iterator Iter = T*>
 class dense_matrix_view
     : public __ranges::view_interface<dense_matrix_view<T, Iter>> {
 public:
@@ -35,7 +35,7 @@ public:
   }
 
   scalar_reference operator[](key_type idx) const
-  requires(std::random_access_iterator<Iter>)
+    requires(std::random_access_iterator<Iter>)
   {
     return data_[idx[0] * ld_ + idx[1]];
   }
@@ -44,7 +44,8 @@ public:
     Iter data = __ranges::next(data_, row_index * ld_);
     __ranges::subrange row_values(data, __ranges::next(data, shape()[1]));
 
-    auto column_indices = __ranges::views::iota(size_type(0), size_type(shape()[1]));
+    auto column_indices =
+        __ranges::views::iota(size_type(0), size_type(shape()[1]));
 
     return __ranges::views::zip(column_indices, row_values);
   }
@@ -54,7 +55,8 @@ public:
         __ranges::views::iota(size_type(0), size_type(shape()[0]));
 
     Iter data = __ranges::next(data_, column_index);
-    __ranges::subrange data_view(data, __ranges::next(data_, shape()[0]*ld()));
+    __ranges::subrange data_view(data,
+                                 __ranges::next(data_, shape()[0] * ld()));
     auto column_values = __ranges::views::stride(data_view, ld());
 
     return __ranges::views::zip(row_indices, column_values);
@@ -66,13 +68,13 @@ public:
   //       0 1 2
   //       4 5 6
   //       7 8 9
-  // 
+  //
   // We have the following diagonals
   // - diagonal(0) returns [0, 5, 9]
   // - diagonal(1) returns [1, 6]
   // - diagonal(2) OR diagonal(-2) returns [7]
   // - diagonal(3) OR diagonal(-1) returns [4, 8]
-  // 
+  //
   // This negative indexing is commonly used in many scientific codes.
   // However, we also support positive indexing to support easily
   // iterating through all diagonals.  The negative indexing works
@@ -98,13 +100,16 @@ public:
     }
 
     if (diagonal_index < shape()[1]) {
-      auto diagonal_indices = __ranges::views::iota(size_type(0), std::min(shape()[0], shape()[1] - size_type(diagonal_index)));
+      auto diagonal_indices = __ranges::views::iota(
+          size_type(0),
+          std::min(shape()[0], shape()[1] - size_type(diagonal_index)));
 
       size_type column_index = diagonal_index;
       Iter data = __ranges::next(data_, diagonal_index);
-      __ranges::subrange data_view(data, __ranges::next(data_, shape()[0]*ld()));
+      __ranges::subrange data_view(data,
+                                   __ranges::next(data_, shape()[0] * ld()));
 
-      auto diagonal_values = __ranges::views::stride(data_view, ld()+1);
+      auto diagonal_values = __ranges::views::stride(data_view, ld() + 1);
 
       return __ranges::views::zip(diagonal_indices, diagonal_values);
     } else {
@@ -113,14 +118,16 @@ public:
       // Elide mod because of range precondition.
       difference_type negative_d = diagonal_index - num_diagonals();
 
-      auto diagonal_indices = __ranges::views::iota(size_type(0), std::min(shape()[1], shape()[0] + negative_d));
+      auto diagonal_indices = __ranges::views::iota(
+          size_type(0), std::min(shape()[1], shape()[0] + negative_d));
 
       size_type row_index = -negative_d;
-      Iter data = __ranges::next(data_, row_index*ld_);
+      Iter data = __ranges::next(data_, row_index * ld_);
 
-      __ranges::subrange data_view(data, __ranges::next(data_, shape()[0]*ld()));
+      __ranges::subrange data_view(data,
+                                   __ranges::next(data_, shape()[0] * ld()));
 
-      auto diagonal_values = __ranges::views::stride(data_view, ld()+1);
+      auto diagonal_values = __ranges::views::stride(data_view, ld() + 1);
 
       return __ranges::views::zip(diagonal_indices, diagonal_values);
     }
@@ -140,4 +147,4 @@ template <std::random_access_iterator Iter>
 dense_matrix_view(Iter, mc::index<>)
     -> dense_matrix_view<std::iter_value_t<Iter>, Iter>;
 
-} // end mc
+} // namespace mc

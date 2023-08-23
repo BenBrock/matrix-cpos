@@ -1,9 +1,9 @@
 #pragma once
 
-#include <vector>
+#include <algorithm>
 #include <numeric>
 #include <random>
-#include <algorithm>
+#include <vector>
 
 namespace mc {
 
@@ -16,30 +16,30 @@ auto generate_csr(I m, I n, std::size_t nnz, std::size_t seed = 0) {
   colind.reserve(nnz);
 
   std::mt19937 g(seed);
-  std::uniform_int_distribution<I> d(0, n-1);
+  std::uniform_int_distribution<I> d(0, n - 1);
   std::uniform_real_distribution d_f(0.0, 100.0);
   std::uniform_int_distribution<I> d_m(0, nnz);
 
   for (std::size_t i = 0; i < nnz; i++) {
-  	colind.push_back(d(g));
+    colind.push_back(d(g));
   }
 
   for (std::size_t i = 0; i < nnz; i++) {
-  	values.push_back(d_f(g));
+    values.push_back(d_f(g));
   }
 
   std::vector<I> rowptr;
-  rowptr.reserve(m+1);
+  rowptr.reserve(m + 1);
   rowptr.push_back(0);
-  for (std::size_t i = 0; i < m-1; i++) {
-  	rowptr.push_back(d_m(g));
+  for (std::size_t i = 0; i < m - 1; i++) {
+    rowptr.push_back(d_m(g));
   }
   rowptr.push_back(nnz);
 
   std::sort(rowptr.begin(), rowptr.end());
 
   for (std::size_t i = m; i >= 1; i--) {
-  	rowptr[i] -= rowptr[i-1];
+    rowptr[i] -= rowptr[i - 1];
   }
 
   std::inclusive_scan(rowptr.begin(), rowptr.end(), rowptr.begin());
@@ -49,8 +49,10 @@ auto generate_csr(I m, I n, std::size_t nnz, std::size_t seed = 0) {
 
 template <typename T = float, typename I = int>
 auto generate_csc(I m, I n, std::size_t nnz, std::size_t seed = 0) {
-  auto&& [values, colptr, rowind, shape_, nnz_] = generate_csr<T, I>(n, m, nnz, seed);
-  return std::tuple(std::move(values), std::move(colptr), std::move(rowind), mc::index<I>(m, n), I(nnz));
+  auto&& [values, colptr, rowind, shape_, nnz_] =
+      generate_csr<T, I>(n, m, nnz, seed);
+  return std::tuple(std::move(values), std::move(colptr), std::move(rowind),
+                    mc::index<I>(m, n), I(nnz));
 }
 
-} // end mc
+} // namespace mc
