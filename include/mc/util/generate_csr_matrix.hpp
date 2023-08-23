@@ -47,4 +47,10 @@ auto generate_csr(I m, I n, std::size_t nnz, std::size_t seed = 0) {
   return std::tuple(values, rowptr, colind, mc::index<I>(m, n), I(nnz));
 }
 
+template <typename T = float, typename I = int>
+auto generate_csc(I m, I n, std::size_t nnz, std::size_t seed = 0) {
+  auto&& [values, colptr, rowind, shape_, nnz_] = generate_csr<T, I>(n, m, nnz, seed);
+  return std::tuple(std::move(values), std::move(colptr), std::move(rowind), mc::index<I>(m, n), I(nnz));
+}
+
 } // end mc
