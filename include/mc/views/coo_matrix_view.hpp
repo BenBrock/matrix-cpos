@@ -76,6 +76,7 @@ public:
     return __ranges::views::zip(colind, values);
   }
 
+private:
   auto row_batch() const {
     auto rowind = __ranges::subrange(rowind_, rowind_ + nnz_);
 
@@ -93,7 +94,7 @@ public:
                     }
                   });
 
-    rowptr[rowind.back()+1] = nnz_;
+    rowptr[rowind.back() + 1] = nnz_;
 
     std::inclusive_scan(std::execution::par_unseq, rowptr.begin(), rowptr.end(),
                         rowptr.begin(),
@@ -105,8 +106,7 @@ public:
              auto&& [row_index, first] = std::get<0>(x);
              auto&& [_, last] = std::get<1>(x);
 
-             auto values =
-                 __ranges::subrange(values_ + first, values_ + last);
+             auto values = __ranges::subrange(values_ + first, values_ + last);
              auto column_indices =
                  __ranges::subrange(colind_ + first, colind_ + last);
 
@@ -115,7 +115,6 @@ public:
            });
   }
 
-private:
   using __values_range_type = decltype(__ranges::subrange(
       std::declval<TIter>(), std::declval<TIter>()));
   using __rowind_range_type = decltype(__ranges::subrange(

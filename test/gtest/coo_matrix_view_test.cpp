@@ -34,8 +34,7 @@ TEST(CooMatrixView, RowViews) {
 
     global_idx = 0;
 
-    // for (auto&& [i, row] : mc::rows(view)) {
-    for (auto&& [i, row] : view.row_batch()) {
+    for (auto&& [i, row] : mc::rows(view)) {
 
       if (row.size() > 0 && global_idx > 0) {
         EXPECT_TRUE(rowind[global_idx - 1] != rowind[global_idx]);
