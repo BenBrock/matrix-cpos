@@ -1,7 +1,9 @@
 #pragma once
 
 #include <iterator>
+
 #include <mc/index.hpp>
+#include <mc/ranges.hpp>
 
 namespace mc {
 
@@ -34,18 +36,26 @@ public:
     I first = rowptr_[row_index];
     I last = rowptr_[row_index + 1];
 
-    __ranges::subrange row_values(__ranges::next(values_data(), first),
-                                  __ranges::next(values_data(), last));
     __ranges::subrange column_indices(__ranges::next(colind_data(), first),
                                       __ranges::next(colind_data(), last));
+    __ranges::subrange row_values(__ranges::next(values_data(), first),
+                                  __ranges::next(values_data(), last));
 
     return __ranges::views::zip(column_indices, row_values);
   }
 
+  auto rows() const {
+    auto row_indices = __ranges::views::iota(I(0), I(shape()[0]));
+
+    auto row_values =
+        row_indices | __ranges::views::transform(
+                          [*this](auto row_index) { return row(row_index); });
+
+    return __ranges::views::zip(row_indices, row_values);
+  }
+
   auto values_data() const { return values_; }
-
   auto rowptr_data() const { return rowptr_; }
-
   auto colind_data() const { return colind_; }
 
 private:

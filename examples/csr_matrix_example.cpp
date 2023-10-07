@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
   using T = int;
   using I = int;
 
-  auto [values, rowptr, colind, shape, _] = mc::generate_csr(m, n, nnz);
+  auto [values, rowptr, colind, shape, _] = mc::generate_csr<T, I>(m, n, nnz);
 
   mc::csr_matrix_view view(values.begin(), rowptr.begin(), colind.begin(),
                            shape, nnz);
@@ -19,6 +19,11 @@ int main(int argc, char** argv) {
   for (std::size_t i = 0; i < view.shape()[0]; i++) {
     auto row = view.row(i);
     fmt::print("Row {}: {}\n", i, row);
+  }
+
+  fmt::print("Printing out rows:\n");
+  for (auto&& [row_index, row] : view.rows()) {
+    fmt::print("Row {}: {}\n", row_index, row);
   }
 
   return 0;

@@ -50,6 +50,17 @@ public:
     return __ranges::views::zip(column_indices, row_values);
   }
 
+  auto rows() const {
+    auto row_indices =
+        __ranges::views::iota(std::size_t(0), std::size_t(shape()[0]));
+
+    auto row_values =
+        row_indices | __ranges::views::transform(
+                          [*this](auto row_index) { return row(row_index); });
+
+    return __ranges::views::zip(row_indices, row_values);
+  }
+
   auto column(size_type column_index) const {
     auto row_indices =
         __ranges::views::iota(size_type(0), size_type(shape()[0]));
@@ -60,6 +71,18 @@ public:
     auto column_values = __ranges::views::stride(data_view, ld());
 
     return __ranges::views::zip(row_indices, column_values);
+  }
+
+  auto columns() const {
+    auto column_indices =
+        __ranges::views::iota(std::size_t(0), std::size_t(shape()[1]));
+
+    auto column_values =
+        column_indices | __ranges::views::transform([*this](auto column_index) {
+          return column(column_index);
+        });
+
+    return __ranges::views::zip(column_indices, column_values);
   }
 
   // NOTE: the diagonal() method allows both negative and positive
@@ -131,6 +154,18 @@ public:
 
       return __ranges::views::zip(diagonal_indices, diagonal_values);
     }
+  }
+
+  auto diagonals() const {
+    auto diagonal_indices =
+        __ranges::views::iota(std::size_t(0), std::size_t(num_diagonals()));
+
+    auto diagonal_values =
+        diagonal_indices |
+        __ranges::views::transform(
+            [*this](auto diagonal_index) { return diagonal(diagonal_index); });
+
+    return __ranges::views::zip(diagonal_indices, diagonal_values);
   }
 
   Iter data() const { return data_; }

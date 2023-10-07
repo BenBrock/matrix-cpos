@@ -5,3 +5,5 @@ endfunction()
 
 add_example(dense_matrix_example)
 add_example(csr_matrix_example)
+add_example(dcsr_matrix_example)
+add_example(coo_matrix_example)

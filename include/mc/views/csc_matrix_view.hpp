@@ -1,7 +1,9 @@
 #pragma once
 
 #include <iterator>
+
 #include <mc/index.hpp>
+#include <mc/ranges.hpp>
 #include <mc/views/csr_matrix_view.hpp>
 
 namespace mc {

@@ -1,3 +1,3 @@
 #pragma once
 
-#include <mc/util/generate_csr_matrix.hpp>
+#include <mc/util/generate_matrices.hpp>
