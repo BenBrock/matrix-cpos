@@ -15,10 +15,18 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-find_package(fmt)
+FetchContent_Declare(
+  mdspan
+  GIT_REPOSITORY https://github.com/kokkos/mdspan.git
+  GIT_TAG mdspan-0.6.0)
+FetchContent_MakeAvailable(mdspan)
+
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG 10.1.1)
+FetchContent_MakeAvailable(fmt)
 
 add_subdirectory(include)
-
 add_subdirectory(examples)
-
 add_subdirectory(test)

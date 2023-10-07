@@ -1,9 +1,10 @@
 function(add_example example_name)
 	add_executable(${example_name} ${example_name}.cpp)
-	target_link_libraries(${example_name} mc)
+	target_link_libraries(${example_name} mc fmt mdspan)
 endfunction()
 
 add_example(dense_matrix_example)
 add_example(csr_matrix_example)
 add_example(dcsr_matrix_example)
 add_example(coo_matrix_example)
+add_example(mdspan_example)

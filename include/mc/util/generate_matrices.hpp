@@ -136,7 +136,7 @@ auto generate_coo(I m, I n, std::size_t nnz, std::size_t seed = 0) {
   return std::tuple(values, rowind, colind, mc::index<I>(m, n), I(nnz));
 }
 
-template <typename T>
+template <typename T = float>
 auto generate_dense(std::size_t m, std::size_t n, std::size_t seed = 0) {
   std::vector<T> v;
   v.reserve(m * n);
@@ -144,7 +144,7 @@ auto generate_dense(std::size_t m, std::size_t n, std::size_t seed = 0) {
   std::mt19937 g(seed);
   std::uniform_real_distribution d(0.0, 100.0);
 
-  for (auto&& x : v) {
+  for (std::size_t i = 0; i < m * n; i++) {
     v.push_back(d(g));
   }
 
