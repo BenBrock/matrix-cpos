@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mc/detail/tag_invoke.hpp>
 #include <mc/ranges.hpp>
 
 namespace mc {
@@ -24,32 +25,53 @@ concept has_diagonals_method = requires(T& t) {
   { t.diagonals() } -> __ranges::view;
 };
 
+} // namespace __detail
+
 struct rows_fn_ {
   template <__detail::has_rows_method T>
+    requires(!mc::is_tag_invocable_v<rows_fn_, T>)
   constexpr auto operator()(T&& t) const {
-    return t.rows();
+    return std::forward<T>(t).rows();
+  }
+
+  template <typename T>
+    requires(mc::is_tag_invocable_v<rows_fn_, T>)
+  constexpr auto operator()(T&& t) const {
+    return mc::tag_invoke(rows_fn_{}, std::forward<T>(t));
   }
 };
 
 struct columns_fn_ {
   template <__detail::has_columns_method T>
+    requires(!mc::is_tag_invocable_v<columns_fn_, T>)
   constexpr auto operator()(T&& t) const {
-    return t.columns();
+    return std::forward<T>(t).columns();
+  }
+
+  template <typename T>
+    requires(mc::is_tag_invocable_v<columns_fn_, T>)
+  constexpr auto operator()(T&& t) const {
+    return mc::tag_invoke(columns_fn_{}, std::forward<T>(t));
   }
 };
 
 struct diagonals_fn_ {
   template <__detail::has_diagonals_method T>
+    requires(!mc::is_tag_invocable_v<diagonals_fn_, T>)
   constexpr auto operator()(T&& t) const {
-    return t.diagonals();
+    return std::forward<T>(t).diagonals();
+  }
+
+  template <typename T>
+    requires(mc::is_tag_invocable_v<diagonals_fn_, T>)
+  constexpr auto operator()(T&& t) const {
+    return mc::tag_invoke(diagonals_fn_{}, std::forward<T>(t));
   }
 };
 
-} // namespace __detail
-
-inline constexpr auto rows = __detail::rows_fn_{};
-inline constexpr auto columns = __detail::columns_fn_{};
-inline constexpr auto diagonals = __detail::diagonals_fn_{};
+inline constexpr auto rows = rows_fn_{};
+inline constexpr auto columns = columns_fn_{};
+inline constexpr auto diagonals = diagonals_fn_{};
 
 template <typename T>
 concept row_iterable = requires(T& r) { rows(r); };
