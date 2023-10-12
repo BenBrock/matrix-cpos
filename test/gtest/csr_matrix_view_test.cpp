@@ -24,5 +24,15 @@ TEST(CsrMatrixView, RowViews) {
         ++j_ptr;
       }
     }
+
+    for (auto&& [i, row] : mc::rows(view)) {
+      EXPECT_EQ(row.size(), rowptr[i + 1] - rowptr[i]);
+      std::size_t j_ptr = rowptr[i];
+      for (auto&& [j, v] : row) {
+        EXPECT_EQ(v, values[j_ptr]);
+        EXPECT_EQ(j, colind[j_ptr]);
+        ++j_ptr;
+      }
+    }
   }
 }

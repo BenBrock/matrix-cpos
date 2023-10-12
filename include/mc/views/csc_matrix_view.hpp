@@ -36,6 +36,8 @@ public:
 
   auto column(I column_index) const { return matrix_t_.row(column_index); }
 
+  auto columns() const { return matrix_t_.rows(); }
+
   auto values_data() const { return matrix_t_.values_data(); }
 
   auto colptr_data() const { return matrix_t_.rowptr_data(); }

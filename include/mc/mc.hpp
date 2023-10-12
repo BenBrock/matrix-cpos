@@ -10,3 +10,5 @@
 
 #include <mc/cpos.hpp>
 #include <mc/mdspan_cpos.hpp>
+
+#include <mc/algorithms/algorithms.hpp>

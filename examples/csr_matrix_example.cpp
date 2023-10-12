@@ -26,5 +26,10 @@ int main(int argc, char** argv) {
     fmt::print("Row {}: {}\n", row_index, row);
   }
 
+  auto a = view;
+
+  std::vector<T> c(m, 0);
+  std::vector<T> b(n, 1);
+
   return 0;
 }
