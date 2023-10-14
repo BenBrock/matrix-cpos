@@ -6,11 +6,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "-O3 -march=native")
 
+option(ENABLE_SYCL "Build with SYCL" OFF)
+option(GCC_TOOLCHAIN "Path to GCC installation to be used by Clang-based compilers" OFF)
+
+if(ENABLE_SYCL)
+    add_compile_options(-fsycl)
+    add_link_options(-fsycl)
+endif()
+
 if(GCC_TOOLCHAIN)
   add_compile_options(--gcc-toolchain=${GCC_TOOLCHAIN})
   add_link_options(--gcc-toolchain=${GCC_TOOLCHAIN})
 endif()
-
 
 include(FetchContent)
 FetchContent_Declare(

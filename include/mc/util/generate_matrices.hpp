@@ -10,10 +10,15 @@
 
 namespace mc {
 
-template <typename T = float, typename I = int>
-auto generate_csr(I m, I n, std::size_t nnz, std::size_t seed = 0) {
-  std::vector<T> values;
-  std::vector<I> colind;
+template <typename T = float, typename I = int,
+          typename Allocator = std::allocator<T>>
+auto generate_csr(I m, I n, std::size_t nnz, std::size_t seed = 0,
+                  const Allocator& alloc = Allocator{}) {
+  using IAllocator = std::allocator_traits<Allocator>::template rebind_alloc<I>;
+  IAllocator i_alloc(alloc);
+
+  std::vector<T, Allocator> values(alloc);
+  std::vector<I, IAllocator> colind(i_alloc);
 
   values.reserve(nnz);
   colind.reserve(nnz);
@@ -31,7 +36,7 @@ auto generate_csr(I m, I n, std::size_t nnz, std::size_t seed = 0) {
     values.push_back(d_f(g));
   }
 
-  std::vector<I> rowptr;
+  std::vector<I, IAllocator> rowptr(i_alloc);
   rowptr.reserve(m + 1);
   rowptr.push_back(0);
   for (std::size_t i = 0; i < m - 1; i++) {
@@ -58,10 +63,15 @@ auto generate_csc(I m, I n, std::size_t nnz, std::size_t seed = 0) {
                     mc::index<I>(m, n), I(nnz));
 }
 
-template <typename T = float, typename I = int>
-auto generate_dcsr(I m, I n, std::size_t nnz, std::size_t seed = 0) {
+template <typename T = float, typename I = int,
+          typename Allocator = std::allocator<T>>
+auto generate_dcsr(I m, I n, std::size_t nnz, std::size_t seed = 0,
+                   const Allocator& alloc = Allocator{}) {
+  using IAllocator = std::allocator_traits<Allocator>::template rebind_alloc<I>;
+  IAllocator i_alloc(alloc);
+
   auto&& [values, rowptr_, colind, shape, _] =
-      generate_csr<T, I>(m, n, nnz, seed);
+      generate_csr<T, I, Allocator>(m, n, nnz, seed, alloc);
 
   std::size_t num_rows = 0;
 
@@ -71,8 +81,8 @@ auto generate_dcsr(I m, I n, std::size_t nnz, std::size_t seed = 0) {
     }
   }
 
-  std::vector<I> rowptr(num_rows + 1);
-  std::vector<I> rowind(num_rows);
+  std::vector<I, IAllocator> rowptr(num_rows + 1, i_alloc);
+  std::vector<I, IAllocator> rowind(num_rows, i_alloc);
 
   I rp_idx = 0;
   for (std::size_t i = 0; i < m; i++) {
