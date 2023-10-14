@@ -6,6 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "-O3 -march=native")
 
+if(GCC_TOOLCHAIN)
+  add_compile_options(--gcc-toolchain=${GCC_TOOLCHAIN})
+  add_link_options(--gcc-toolchain=${GCC_TOOLCHAIN})
+endif()
+
+
 include(FetchContent)
 FetchContent_Declare(
   googletest
