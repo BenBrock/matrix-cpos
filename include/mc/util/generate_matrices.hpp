@@ -1,11 +1,11 @@
 #pragma once
 
 #include <algorithm>
+#include <iostream>
 #include <memory>
 #include <numeric>
 #include <random>
 #include <vector>
-#include <iostream>
 
 #include <mc/ranges.hpp>
 
@@ -150,7 +150,7 @@ auto generate_coo(I m, I n, std::size_t nnz, std::size_t seed = 0) {
 template <typename T = float, typename I = int,
           typename Allocator = std::allocator<T>>
 auto generate_bcsr(I m, I n, I bh, I bw, std::size_t nnz, std::size_t seed = 0,
-                  const Allocator& alloc = Allocator{}) {
+                   const Allocator& alloc = Allocator{}) {
   using IAllocator = std::allocator_traits<Allocator>::template rebind_alloc<I>;
   IAllocator i_alloc(alloc);
 
@@ -167,22 +167,25 @@ auto generate_bcsr(I m, I n, I bh, I bw, std::size_t nnz, std::size_t seed = 0,
   for (std::size_t i = 0; i < shape[0]; i += bh) {
     for (std::size_t j = 0; j < shape[1]; j += bw) {
       bool find = false;
-      for (std::size_t ir = 0; ir < _rowind.size(); ir ++) {
-        if (_rowind[ir] >= i && _rowind[ir] < i + bh && _colind[ir] >= j && _colind[ir] < j + bw) {
+      for (std::size_t ir = 0; ir < _rowind.size(); ir++) {
+        if (_rowind[ir] >= i && _rowind[ir] < i + bh && _colind[ir] >= j &&
+            _colind[ir] < j + bw) {
           if (!find) {
             find = true;
-            block_num ++;
-            new_values.resize(block_num * bh*bw);
-            new_values[(block_num-1)*bh*bw + (_rowind[ir]-i)*bw + (_colind[ir]-j)] = values[ir];
+            block_num++;
+            new_values.resize(block_num * bh * bw);
+            new_values[(block_num - 1) * bh * bw + (_rowind[ir] - i) * bw +
+                       (_colind[ir] - j)] = values[ir];
             colind.push_back(j);
           } else {
-            new_values[(block_num-1)*bh*bw + (_rowind[ir]-i)*bw + (_colind[ir]-j)] = values[ir];
+            new_values[(block_num - 1) * bh * bw + (_rowind[ir] - i) * bw +
+                       (_colind[ir] - j)] = values[ir];
           }
         }
       }
     }
     rowptr.push_back(block_num);
-  }  
+  }
   return std::tuple(new_values, rowptr, colind, mc::index<I>(m, n), I(nnz));
 }
 

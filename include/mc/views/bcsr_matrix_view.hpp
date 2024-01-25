@@ -1,15 +1,13 @@
 #pragma once
 
+#include <iostream>
 #include <iterator>
 #include <utility>
-#include <iostream>
 
 #include <mc/index.hpp>
 #include <mc/ranges.hpp>
 
 namespace mc {
-
-
 
 template <typename T, typename I, std::forward_iterator TIter = T*,
           std::forward_iterator IIter = I*>
@@ -30,8 +28,7 @@ public:
   bcsr_matrix_view(TIter values, IIter rowptr, IIter colind, key_type shape,
                    size_type block_height, size_type block_width, size_type nnz)
       : values_(values), rowptr_(rowptr), colind_(colind), shape_(shape),
-        block_height_(block_height), block_width_(block_width), nnz_(nnz) {
-      }
+        block_height_(block_height), block_width_(block_width), nnz_(nnz) {}
 
   key_type shape() const noexcept { return shape_; }
 
@@ -47,20 +44,20 @@ public:
         block_values.push_back(T(e));
       }
     }
-    
+
     const Block operator=(const Block& block) {
-      for (auto && e : block.block_values) {
+      for (auto&& e : block.block_values) {
         block_values.push_back(std::move(e));
       }
     }
-    Block(const Block& block){
-      for (auto && e : block.block_values) {
+    Block(const Block& block) {
+      for (auto&& e : block.block_values) {
         block_values.push_back(std::move(e));
       }
     }
-    
+
     void print() const {
-      for (auto && e : block_values) {
+      for (auto&& e : block_values) {
         std::cout << e << " ";
       }
       std::cout << std::endl;
@@ -72,8 +69,8 @@ public:
     I index = block_index.second;
     I column_index = colind_[index];
 
-    I first = index*bh()*bw();
-    I last = (index+1)*bh()*bw();
+    I first = index * bh() * bw();
+    I last = (index + 1) * bh() * bw();
 
     __ranges::subrange block_values(__ranges::next(values_data(), first),
                                     __ranges::next(values_data(), last));
@@ -86,7 +83,7 @@ public:
   auto blocks() const {
     I block_end = shape()[0] / bh();
     auto row_indices = __ranges::views::iota(I(0), I(block_end));
-    
+
     std::vector<std::pair<I, I>> row_and_id_indices;
     for (auto row_index : row_indices) {
       I first = rowptr_[row_index];
@@ -95,17 +92,22 @@ public:
         row_and_id_indices.push_back(std::make_pair(row_index, index));
       }
     }
-    // for_each(block_indices.begin(), block_indices.end(), [](std::pair<I, I> p){
+    // for_each(block_indices.begin(), block_indices.end(), [](std::pair<I, I>
+    // p){
     //   std::cout << "(" << p.first << ", " << p.second << ")";
     // });
     // std::cout << std::endl;
-    auto block_indices = 
-        row_and_id_indices | __ranges::views::transform(
-          [*this](std::pair<I,I> row_and_id_index) { return std::make_pair(row_and_id_index.first*bh(), colind_[row_and_id_index.second]); });
+    auto block_indices =
+        row_and_id_indices |
+        __ranges::views::transform([*this](std::pair<I, I> row_and_id_index) {
+          return std::make_pair(row_and_id_index.first * bh(),
+                                colind_[row_and_id_index.second]);
+        });
 
-    auto block_values =
-        row_and_id_indices | __ranges::views::transform(
-                          [*this](auto block_index) { return block(block_index); });
+    auto block_values = row_and_id_indices |
+                        __ranges::views::transform([*this](auto block_index) {
+                          return block(block_index);
+                        });
 
     // for (auto&& index : block_indices) {
     //   std::cout << "(" << index.first << "," << index.second << ")";
@@ -136,6 +138,6 @@ private:
 template <typename TIter, typename IIter, typename... Args>
 bcsr_matrix_view(TIter, IIter, IIter, Args&&...)
     -> bcsr_matrix_view<std::iter_value_t<TIter>, std::iter_value_t<IIter>,
-                       TIter, IIter>;
+                        TIter, IIter>;
 
 } // namespace mc
