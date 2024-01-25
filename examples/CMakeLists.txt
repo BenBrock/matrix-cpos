@@ -8,6 +8,7 @@ add_example(csr_matrix_example)
 add_example(dcsr_matrix_example)
 add_example(coo_matrix_example)
 add_example(mdspan_example)
+add_example(bcsr_matrix_view_example)
 
 if(ENABLE_SYCL)
 	add_example(sycl_example)
