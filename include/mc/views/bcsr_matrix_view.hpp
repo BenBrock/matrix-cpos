@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iterator>
 #include <utility>
+#include <vector>
 
 #include <mc/index.hpp>
 #include <mc/ranges.hpp>
