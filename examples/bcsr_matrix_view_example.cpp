@@ -12,22 +12,11 @@ int main() {
   for (auto&& [m, n, nnz] : {std::tuple(6, 6, 5)}) {
     int block_height = 2;
     int block_width = 2;
-    auto [values, rowptr, colind, shape, _] =
+    auto [values, rowptr, colind, shape, a_nnz] =
         mc::generate_bcsr(m, n, block_height, block_width, nnz);
 
     mc::bcsr_matrix_view view(values.begin(), rowptr.begin(), colind.begin(),
                               shape, block_height, block_width, nnz);
-    for_each(rowptr.begin(), rowptr.end(),
-             [](int i) { std::cout << i << " "; });
-    std::cout << std::endl;
-    for_each(colind.begin(), colind.end(),
-             [](int i) { std::cout << i << " "; });
-    std::cout << std::endl;
-    for_each(values.begin(), values.end(),
-             [](int i) { std::cout << i << " "; });
-    std::cout << std::endl;
-
-    auto A = view.blocks();
 
     fmt::print("values: {}\n", values);
     fmt::print("rowptr: {}\n", rowptr);
@@ -44,6 +33,27 @@ int main() {
                                            block_height * block_width);
         fmt::print("A {} x {} block at {}, {} containing values {}\n",
                    block_height, block_width, i_offset, j_offset, v);
+      }
+    }
+
+    int k = 4;
+    auto [b_values, b_rowptr, b_colind, b_shape, b_nnz] =
+      mc::generate_dense(n, k, 123);
+
+    auto [c_values, c_rowptr, c_colind, c_shape, c_nnz] =
+      mc::generate_dense(m, k, 456);
+
+    for (auto [block_index, block_values] : view.blocks()) {
+      auto [block_base_row, column_base] = block_index;
+      I row_base = block_base_row * view.bh();
+      for (size_t i_ = 0; i_ < view.bh(); i_++) {
+        for (size_t j_ = 0; j_ < view.bw(); j_++) {
+          I row_address = row_base + i_;
+          I column_address = column_base + j_;
+          for (size k_ = 0; k_ < k; k_++) {
+            c_values[row_address*n+column_address] = block_values[i_*view.bw()+j_] * b_values[column_address*k+k_];
+          }
+        }
       }
     }
   }
