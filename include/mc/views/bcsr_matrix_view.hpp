@@ -50,6 +50,7 @@ public:
       for (auto&& e : block.block_values) {
         block_values.push_back(std::move(e));
       }
+      return *this;
     }
     Block(const Block& block) {
       for (auto&& e : block.block_values) {
