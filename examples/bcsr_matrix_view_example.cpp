@@ -37,26 +37,27 @@ int main() {
     }
 
     int k = 4;
-    auto [b_values, b_shape] =
-      mc::generate_dense(n, k, 123);
+    auto [b_values, b_shape] = mc::generate_dense(n, k, 123);
 
-    auto [c_values, c_shape] =
-      mc::generate_dense(m, k, 456);
+    auto [c_values, c_shape] = mc::generate_dense(m, k, 456);
 
-    for (auto [block_index, blocks] : view.blocks()) {
-      auto block_base_row = block_index.first;
-      auto column_base = block_index.second;
-      I row_base = block_base_row * view.bh();
-      for (size_t i_ = 0; i_ < view.bh(); i_++) {
-        for (size_t j_ = 0; j_ < view.bw(); j_++) {
-          I row_address = row_base + i_;
-          I column_address = column_base + j_;
-          for (size_t k_ = 0; k_ < k; k_++) {
-            c_values[row_address*n+column_address] = blocks[i_*view.bw()+j_] * b_values[column_address*k+k_];
+    /*
+        for (auto [block_index, blocks] : view.blocks()) {
+          auto block_base_row = block_index.first;
+          auto column_base = block_index.second;
+          I row_base = block_base_row * view.bh();
+          for (size_t i_ = 0; i_ < view.bh(); i_++) {
+            for (size_t j_ = 0; j_ < view.bw(); j_++) {
+              I row_address = row_base + i_;
+              I column_address = column_base + j_;
+              for (size_t k_ = 0; k_ < k; k_++) {
+                c_values[row_address*n+column_address] = blocks[i_*view.bw()+j_]
+       * b_values[column_address*k+k_];
+              }
+            }
           }
         }
-      }
-    }
+        */
   }
 
   return 0;

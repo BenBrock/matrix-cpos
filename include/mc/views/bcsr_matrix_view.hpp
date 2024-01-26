@@ -122,6 +122,26 @@ public:
     return std::ranges::views::zip(row_indices, block_values);
   }
 
+  auto row_blocks(I row_index) const {
+    I first = rowptr_[row_index];
+    I last = rowptr_[row_index + 1];
+
+    __ranges::subrange column_indices(__ranges::next(colind_data(), first),
+                                      __ranges::next(colind_data(), last));
+    __ranges::subrange index_range = __ranges::views::iota(I(first), I(last));
+
+    auto row_blocks =
+        index_range | __ranges::views::transform([*this](auto index) {
+          I start = index * bh() * bw();
+          I end = (index + 1) * bh() * bw();
+          __ranges::subrange block_values(__ranges::next(values_data(), start),
+                                          __ranges::next(values_data(), end));
+          Block A(block_values);
+          return A;
+        });
+    return __ranges::views::zip(column_indices, row_blocks);
+  }
+
   auto values_data() const { return values_; }
   auto rowptr_data() const { return rowptr_; }
   auto colind_data() const { return colind_; }
