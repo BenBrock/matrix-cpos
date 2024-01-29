@@ -41,23 +41,39 @@ int main() {
 
     auto [c_values, c_shape] = mc::generate_dense(m, k, 456);
 
-    /*
-        for (auto [block_index, blocks] : view.blocks()) {
-          auto block_base_row = block_index.first;
-          auto column_base = block_index.second;
-          I row_base = block_base_row * view.bh();
-          for (size_t i_ = 0; i_ < view.bh(); i_++) {
-            for (size_t j_ = 0; j_ < view.bw(); j_++) {
-              I row_address = row_base + i_;
-              I column_address = column_base + j_;
-              for (size_t k_ = 0; k_ < k; k_++) {
-                c_values[row_address*n+column_address] = blocks[i_*view.bw()+j_]
-       * b_values[column_address*k+k_];
-              }
+    // std::for_each(b_values.cbegin(), b_values.cend(), [](I v){
+    //   std::cout << v << " ";
+    // });
+    // std::cout << std::endl;
+    // std::for_each(c_values.cbegin(), c_values.cend(), [](I v){
+    //   std::cout << v << " ";
+    // });
+    // std::cout << std::endl;
+    
+    for (auto&& [i, row] : view.blocks()) {
+      for (auto&& [j, block] : row) {
+        auto block_row_base = i * view.bh();
+        auto block_col_base = j;
+        for (auto i_ : __ranges::views::iota(I(0), I(view.bh()))) {
+          for (auto j_ : __ranges::views::iota(I(0), I(view.bw()))) {
+            if (0 == block[{i_, j_}]) continue;
+            
+            for (auto k_ : __ranges::views::iota(I(0), I(k))) {
+              auto row_addr = block_row_base + i_;
+              auto col_addr = block_col_base + j_;
+              I b_addr = col_addr * k + k_;
+              I c_addr = row_addr * k + k_;
+              // std::cout << c_values[c_addr] << "+=" << block[{i_, j_}] << "*" << b_values[b_addr] << std::endl;
+              c_values[c_addr] += block[{i_, j_}] * b_values[b_addr];
             }
           }
-        }
-        */
+        } 
+      }
+    }
+    // std::for_each(c_values.cbegin(), c_values.cend(), [](I v){
+    //   std::cout << v << " ";
+    // });
+    // std::cout << std::endl;
   }
 
   return 0;
