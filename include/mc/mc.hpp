@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mc/views/bcsr_matrix_view.hpp>
 #include <mc/views/coo_matrix_view.hpp>
 #include <mc/views/csc_matrix_view.hpp>
 #include <mc/views/csr_matrix_view.hpp>
