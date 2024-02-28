@@ -41,17 +41,31 @@ public:
                 __ranges::subrange(colind_, __ranges::next(colind_, nnz_))),
             __ranges::subrange(values_, __ranges::next(values_, nnz_)))) {}
 
-  key_type shape() const noexcept { return shape_; }
+  key_type shape() const noexcept {
+    return shape_;
+  }
 
-  size_type size() const noexcept { return nnz_; }
+  size_type size() const noexcept {
+    return nnz_;
+  }
 
-  auto values_data() const { return values_; }
-  auto rowind_data() const { return rowind_; }
-  auto colind_data() const { return colind_; }
+  auto values_data() const {
+    return values_;
+  }
+  auto rowind_data() const {
+    return rowind_;
+  }
+  auto colind_data() const {
+    return colind_;
+  }
 
-  auto begin() const { return values_view_.begin(); }
+  auto begin() const {
+    return values_view_.begin();
+  }
 
-  auto end() const { return values_view_.end(); }
+  auto end() const {
+    return values_view_.end();
+  }
 
   auto rows() const {
     auto row_indices = __ranges::views::iota(I(0), I(shape()[0]));

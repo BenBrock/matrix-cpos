@@ -32,17 +32,29 @@ public:
     return {matrix_t_.shape()[1], matrix_t_.shape()[0]};
   }
 
-  size_type size() const noexcept { return matrix_t_.size(); }
+  size_type size() const noexcept {
+    return matrix_t_.size();
+  }
 
-  auto column(I column_index) const { return matrix_t_.row(column_index); }
+  auto column(I column_index) const {
+    return matrix_t_.row(column_index);
+  }
 
-  auto columns() const { return matrix_t_.rows(); }
+  auto columns() const {
+    return matrix_t_.rows();
+  }
 
-  auto values_data() const { return matrix_t_.values_data(); }
+  auto values_data() const {
+    return matrix_t_.values_data();
+  }
 
-  auto colptr_data() const { return matrix_t_.rowptr_data(); }
+  auto colptr_data() const {
+    return matrix_t_.rowptr_data();
+  }
 
-  auto rowind_data() const { return matrix_t_.colind_data(); }
+  auto rowind_data() const {
+    return matrix_t_.colind_data();
+  }
 
 private:
   csr_matrix_view<T, I, TIter, IIter> matrix_t_;
