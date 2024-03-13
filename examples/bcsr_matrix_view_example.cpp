@@ -38,17 +38,7 @@ int main() {
 
     int k = 4;
     auto [b_values, b_shape] = mc::generate_dense(n, k, 123);
-
     auto [c_values, c_shape] = mc::generate_dense(m, k, 456);
-
-    // std::for_each(b_values.cbegin(), b_values.cend(), [](I v){
-    //   std::cout << v << " ";
-    // });
-    // std::cout << std::endl;
-    // std::for_each(c_values.cbegin(), c_values.cend(), [](I v){
-    //   std::cout << v << " ";
-    // });
-    // std::cout << std::endl;
     
     for (auto&& [i, row] : view.blocks()) {
       for (auto&& [j, block] : row) {
@@ -63,17 +53,12 @@ int main() {
               auto col_addr = block_col_base + j_;
               I b_addr = col_addr * k + k_;
               I c_addr = row_addr * k + k_;
-              // std::cout << c_values[c_addr] << "+=" << block[{i_, j_}] << "*" << b_values[b_addr] << std::endl;
               c_values[c_addr] += block[{i_, j_}] * b_values[b_addr];
             }
           }
         } 
       }
     }
-    // std::for_each(c_values.cbegin(), c_values.cend(), [](I v){
-    //   std::cout << v << " ";
-    // });
-    // std::cout << std::endl;
   }
 
   return 0;
