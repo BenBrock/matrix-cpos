@@ -43,7 +43,7 @@ int main() {
     for (auto&& [i, row] : view.blocks()) {
       for (auto&& [j, block] : row) {
         auto block_row_base = i * view.bh();
-        auto block_col_base = j;
+        auto block_col_base = j * view.bw();
         for (auto i_ : __ranges::views::iota(I(0), I(view.bh()))) {
           for (auto j_ : __ranges::views::iota(I(0), I(view.bw()))) {
             if (0 == block[{i_, j_}]) continue;
