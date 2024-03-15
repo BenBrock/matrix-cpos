@@ -38,6 +38,7 @@ We need to pass 7 arguments to construct a BCSR view.
 + `nnz` is the number of non-zero elements in original matrix.
 
 For example, for matrix $A$ as follow:
+
 $$
 A = \left(
 \begin{matrix}
@@ -50,6 +51,7 @@ A = \left(
 \end{matrix}
 \right)
 $$
+
 Its `values`, `rowptr` and `colind` arrays are as follows:
 ```
 values: [0, 2.42, 59.26, 0, 0, 0, 85.34, 91.42, 0, 0, 82.82, 0]
