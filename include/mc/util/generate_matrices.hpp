@@ -176,7 +176,7 @@ auto generate_bcsr(I m, I n, I bh, I bw, std::size_t nnz, std::size_t seed = 0,
             new_values.resize(block_num * bh * bw);
             new_values[(block_num - 1) * bh * bw + (_rowind[ir] - i) * bw +
                        (_colind[ir] - j)] = values[ir];
-            colind.push_back(j);
+            colind.push_back(j / bw);
           } else {
             new_values[(block_num - 1) * bh * bw + (_rowind[ir] - i) * bw +
                        (_colind[ir] - j)] = values[ir];
