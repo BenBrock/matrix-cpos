@@ -26,9 +26,13 @@ public:
   dense_matrix_view(Iter data, key_type shape, size_type ld)
       : data_(data), shape_(shape), ld_(ld) {}
 
-  key_type shape() const noexcept { return shape_; }
+  key_type shape() const noexcept {
+    return shape_;
+  }
 
-  size_type size() const noexcept { return shape()[0] * shape()[1]; }
+  size_type size() const noexcept {
+    return shape()[0] * shape()[1];
+  }
 
   size_type num_diagonals() const noexcept {
     return shape()[0] + shape()[1] - 1;
@@ -168,9 +172,13 @@ public:
     return __ranges::views::zip(diagonal_indices, diagonal_values);
   }
 
-  Iter data() const { return data_; }
+  Iter data() const {
+    return data_;
+  }
 
-  size_type ld() const { return ld_; }
+  size_type ld() const {
+    return ld_;
+  }
 
 private:
   Iter data_;

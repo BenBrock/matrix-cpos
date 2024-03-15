@@ -28,9 +28,13 @@ public:
       : values_(values), rowind_(rowind), rowptr_(rowptr), colind_(colind),
         shape_(shape), rowind_size_(rowind_size), nnz_(nnz) {}
 
-  key_type shape() const noexcept { return shape_; }
+  key_type shape() const noexcept {
+    return shape_;
+  }
 
-  size_type size() const noexcept { return nnz_; }
+  size_type size() const noexcept {
+    return nnz_;
+  }
 
   auto rows() const {
     auto row_indices = __ranges::subrange(rowind_, rowind_ + rowind_size_);
@@ -48,10 +52,18 @@ public:
     return __ranges::views::zip(row_indices, row_values);
   }
 
-  auto values_data() const { return values_; }
-  auto rowptr_data() const { return rowptr_; }
-  auto rowind_data() const { return rowind_; }
-  auto colind_data() const { return colind_; }
+  auto values_data() const {
+    return values_;
+  }
+  auto rowptr_data() const {
+    return rowptr_;
+  }
+  auto rowind_data() const {
+    return rowind_;
+  }
+  auto colind_data() const {
+    return colind_;
+  }
 
 private:
   TIter values_;
