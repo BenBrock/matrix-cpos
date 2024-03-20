@@ -88,13 +88,14 @@ for (auto && [{bx, by}, block] : mc::blocks(a)) {
 The processing flow of SpMV $c=Ab$ is designed as follows:
 + Iterate over each block in a sparse matrix. The block iterator is provided by specific interface. The details is transparent to user.
 + Iterate over each element in block and calculate its indices to determine the corresponding indices in $b$ and $c$. Add the resul back to $c$.
++ Here we assume each block is a `dense_matrix_view`.
 
 ```c++
-for (auto&& [{bx, by}, blocks] : mc::blocks(a)) {
-  auto x_base = bx * block_width;
-  auto y_base = by * block_height;
-  for (auto i : __ranges::views::iota(I(0), I(block_height))) {
-    for (auto j : __ranges::views::iota(I(0), I(block_width))) {
+for (auto&& [{bx, by}, block] : mc::blocks(a)) {
+  auto x_base = bx * view.shape()[1];
+  auto y_base = by * view.shape()[0];
+  for (auto i : __ranges::views::iota(I(0), block.shape()[0])) {
+    for (auto j : __ranges::views::iota(I(0), view.shape()[1])) {
       if (0 == block[{i, j}]) continue;
       for (auto kk : __ranges::views::iota(I(0), I(k))) {
         auto x_addr = x_base + i;
