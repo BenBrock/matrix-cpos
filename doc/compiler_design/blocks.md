@@ -91,7 +91,7 @@ The processing flow of SpMV $c=Ab$ is designed as follows:
 + Here we assume each block is a `dense_matrix_view`.
 
 ```c++
-for (auto&& [{bx, by}, block] : mc::blocks(a)) {
+for (auto&& [{bx, by}, block] : view.blocks()) {
   auto x_base = bx * view.shape()[1];
   auto y_base = by * view.shape()[0];
   for (auto i : __ranges::views::iota(I(0), block.shape()[0])) {
@@ -108,3 +108,54 @@ for (auto&& [{bx, by}, block] : mc::blocks(a)) {
   }
 }
 ```
+
+### Parallelism 
+
+We design user interface for parallelism as
+```
+mc::parallel_spmv(N, A, Fn);
+```
+
++ `N` is the number of processors specified by user;
++ `A` is input sparse matrix;
++ `Fn` is the function applied on each block. By capturing by references in lambda functions, it's possible to avoid passing both input vector `b` and output vector `c` into the function.
+
+Two problems should be addressed within the function implementation of `mc::parallel_spmv`:
+1. Resource conflict. The computation for blocks on the same row require access to the same part of vector `b`. To avoid unnecessary data movement, computation for blocks located on the same row should be perfromed on the same processor. For example, the multiplcation for block 3 and 4 should be on the same processor;
+2. Load balance. Balancing the computation load across different processors is beneficial for reducing the algorithm's execution time.
+
+<img src="fig/block-2.png" width=50%>
+
+The pseudo code of the function is as follow:
+```c++
+template <typename T>
+concept has_block_method = requires(T& t) {
+  { t } -> __ranges::random_access_ranges;
+  { t.blocks() } -> __ranges::forward_range;
+  { t.blocks() } -> __ranges::view;
+};
+
+template <std::size_t N, has_block_method R, typename Fn>
+constexpr void parallel_spmv(integer<N> unroll_factor, R&& r, Fn&& fn) {
+  auto task_lists = task_division(N, r.blocks());
+  task_assign(task_lists, fn);
+}
+```
+Here we use concept `has_block_method` to impose the requirements to have a `blocks` cpo on the passed range. The general process of the function is outlined in pseudo-code: first, implement task partitioning considering aforementioned resource conflicts, and then parallelize task execution based on specific hardware. 
+
+The idea in this section is referenced from [SparseACC](https://www.research-collection.ethz.ch/handle/20.500.11850/642508).
+
+### Load balancing 
+
+In addition to considering load balancing at the block level, we can also aim to make each block as compact as possible when partitioning. Making different blocks close to being dense can help reduce the disparity in the number of non-zero elements between different blocks.
+
+The idea is referenced from [Cache-Oblivious, SIAM'09](https://www.researchgate.net/profile/Albert-Jan-Yzelman-2/publication/220411645_Cache-Oblivious_Sparse_Matrix-Vector_Multiplication_by_Using_Sparse_Matrix_Partitioning_Methods/links/5465dbf70cf2052b509fb9fa/Cache-Oblivious-Sparse-Matrix-Vector-Multiplication-by-Using-Sparse-Matrix-Partitioning-Methods.pdf). This paper permute unstructured sparse matrix into SBD(separated block-diagonal) structure.
+
+```
+permute(A)
+```
+
++ `A` is input sparse matrix.
+
+The function design is yet to be completed.
+
